@@ -94,65 +94,15 @@
             });
 
         var view = new MapView({
-              map: map,  // The WebMap instance created above
+              map: webmap,  // The WebMap instance created above
               container: "viewDiv",
-              center: [-120.01,39.05],
-              zoom: 10.5
+              center: [-120.01,39.08],
+              zoom: 11
             });
+          
+        // move zoom buttons to top left
+        view.ui.move("zoom", "top-left");
         
-        // Create a popupTemplate
-        const template = {
-          title: "# of STR's per 100 acres: {Join_Count}",
-          content:[
-              {
-          type: "fields",
-          fieldInfos: [
-                {
-                  fieldName: "COUNTY",
-                  label: "County"
-                }
-                ]
-              }
-              ]            
-        };
-          
-        // well feature layer
-        var strLayer = new FeatureLayer({
-          url: "https://maps.trpa.org/server/rest/services/STR_Density_1/MapServer/0",
-          title: "Short Term Rentals",
-          popupTemplate: template,
-          fields: [{
-            name: "Join_Count",
-            alias: "# of STRs Per 100 Acres"
-          }, {
-            name: "COUNTY",
-            alias: "County"
-          }],
-                });
-          
-        map.add(strLayer);
-        
-        // well feature layer
-        var trpaLayer = new FeatureLayer({
-          url: "https://maps.trpa.org/server/rest/services/Boundaries/MapServer/0",
-          title: "TRPA Boundary"
-        });
-          
-        map.add(trpaLayer);
-          
-        // create legend card
-        var legend = new Legend({
-        view: view,
-        layerInfos: [
-          {
-            layer: strLayer,
-            title: "Short Term Rentals"
-          }
-        ]
-        });
-
-        // Add widget to the bottom right corner of the view
-        view.ui.add(legend, "bottom-right");
           
         // ListItem in a LayerList instance
         const layerList = new LayerList({
@@ -163,7 +113,7 @@
                   // don't show legend twice
                   item.panel = {
                     content: "legend",
-                    open: false
+                    open: true
                   };
                 }
               }
@@ -183,55 +133,6 @@
         // add layer list button to the top right corner of the view
         view.ui.add(layerListExpand, "top-right");
 
-
-        var parcels = new FeatureLayer({
-            url: "https://maps.trpa.org/server/rest/services/Parcels/MapServer/0",
-                popupTemplate: {
-                // autocasts as new PopupTemplate()
-                    title: "Parcel: {APN}",
-                    overwriteActions: false
-                }
-        });
-        
-        webmap.add(parcels);
-          
-        // Create Search Widget with parcel layer as the source data
-        var searchWidget = new Search({
-          view: view,
-          allPlaceholder: "Address or APN",
-          locationEnabled: false,
-          includeDefaultSources: false,
-          popupEnabled: false,
-          sources: [
-            {
-              layer: parcels,
-              searchFields: ["APO_ADDRESS"],
-              displayField: "APO_ADDRESS",
-              exactMatch: false,
-              outFields: ["APO_ADDRESS"],
-              name: "Address",
-              zoomScale: 24000,
-            },
-            {
-              layer: parcels,
-              searchFields: ["APN"],
-              displayField: "APN",
-              exactMatch: false,
-              outFields: ["APN"],
-              name: "APN",
-              zoomScale: 24000,
-            }
-          ]
-        });
-
-        // Add the search widget to the top left corner of the view
-        view.ui.add(searchWidget, {
-            position: "top-left"
-        });
-          
-        // move zoom buttons to top left
-        view.ui.move("zoom", "top-left");
-          
         // Createa Home Button
         var homeWidget = new Home({
             view: view
@@ -256,7 +157,23 @@
         });
 
         // Add the basemap gallery button
-        view.ui.add(bgExpand, "bottom-left");       
+        view.ui.add(bgExpand, "bottom-left"); 
+
+        // add a legend widget instance to the view
+        // and set the style to 'card'. This is a
+        // responsive style, which is good for mobile devices
+        // or 'classic' for PC users
+        const legend = new Expand({
+            expandIconClass: "esri-icon-layer-list",  // see https://developers.arcgis.com/javascript/latest/guide/esri-icon-font
+            expandTooltip: "Legend",
+            content: new Legend({
+                view: view,
+                style: "card" // other styles include 'card'
+                }),
+            view: view,
+            expanded: false
+        });
+        view.ui.add(legend, "bottom-right");       
     });   
 	</script>
   </head>
