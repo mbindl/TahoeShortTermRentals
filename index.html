@@ -94,7 +94,7 @@
             });
 
         var view = new MapView({
-              map: map,  // The WebMap instance created above
+              map: webmap,  // The WebMap instance created above
               container: "viewDiv",
               center: [-120.01,39.05],
               zoom: 10.5
@@ -145,7 +145,7 @@
         view: view,
         layerInfos: [
           {
-            layer: strLayer,
+            layer: "Short Term Rental Density",
             title: "Short Term Rentals"
           }
         ]
@@ -163,7 +163,7 @@
                   // don't show legend twice
                   item.panel = {
                     content: "legend",
-                    open: false
+                    open: true
                   };
                 }
               }
@@ -183,7 +183,8 @@
         // add layer list button to the top right corner of the view
         view.ui.add(layerListExpand, "top-right");
 
-
+        layerList.selectionEnabled = true;
+        
         var parcels = new FeatureLayer({
             url: "https://maps.trpa.org/server/rest/services/Parcels/MapServer/0",
                 popupTemplate: {
